@@ -1,7 +1,6 @@
 package com.example.ppb
 
 import android.os.Bundle
-import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -9,25 +8,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.ppb.ui.theme.PPBTheme
-import java.nio.file.WatchEvent
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -40,13 +28,6 @@ class MainActivity : ComponentActivity() {
                 MyApp()
             }
         }
-    }
-}
-
-@Composable
-fun ClickCounter(clicks: Int, onClick: () -> Unit) {
-    Button(onClick = onClick) {
-        Text("I've been clicked $clicks times")
     }
 }
 
@@ -68,7 +49,7 @@ fun Checkout(modifier: Modifier = Modifier){
     }
 }
 @Composable
-fun Menu(modifier: Modifier = Modifier){
+fun Menu(){
     Row (
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -91,7 +72,7 @@ fun MenuItem(item: String){
     }
 }
 @Composable
-fun Totals(cash:Double, card:Double, modifier: Modifier = Modifier){
+fun Totals(cash:Double, card:Double){
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -109,7 +90,7 @@ fun Totals(cash:Double, card:Double, modifier: Modifier = Modifier){
 
 @Composable
 fun Payment(paymentType: String, amount: Double, modifier: Modifier = Modifier) {
-    val usFormat = NumberFormat.getCurrencyInstance(Locale.US);
+    val usFormat = NumberFormat.getCurrencyInstance(Locale.US)
     val amountStr = usFormat.format(amount)
 
     Column(
