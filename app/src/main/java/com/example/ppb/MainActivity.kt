@@ -179,19 +179,29 @@ fun Menu(menuItems: List<MenuItem>, onChange: (itemCount: MenuItem) -> Unit) {
 fun MenuItem(menuItem: MenuItem, onChange: (itemCount: MenuItem) -> Unit, modifier: Modifier = Modifier) {
     val costStr = centsToCostStr(menuItem.costCents)
     Column(
-        modifier = modifier,
+        modifier = modifier.padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(menuItem.name)
-        Text(costStr)
-        Button(onClick = { onChange(menuItem.copy(count = menuItem.count + 1)) }) {
-            Text("+")
+        Text(menuItem.name, style = MaterialTheme.typography.headlineMedium)
+        Text(costStr, style = MaterialTheme.typography.titleLarge)
+        Spacer(modifier = Modifier.padding(8.dp))
+        Button(
+            onClick = { onChange(menuItem.copy(count = menuItem.count + 1)) },
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
+        ) {
+            Text("+", style = MaterialTheme.typography.headlineLarge)
         }
-        Text("${menuItem.count}")
+        Text(
+            "${menuItem.count}",
+            style = MaterialTheme.typography.displaySmall,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
         Button(
             enabled = menuItem.count > 0,
-            onClick = { onChange(menuItem.copy(count = menuItem.count - 1)) }) {
-            Text("-")
+            onClick = { onChange(menuItem.copy(count = menuItem.count - 1)) },
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
+        ) {
+            Text("-", style = MaterialTheme.typography.headlineLarge)
         }
     }
 }
