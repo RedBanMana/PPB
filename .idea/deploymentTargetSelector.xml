@@ -16,7 +16,7 @@
       </SelectionState>
       <SelectionState runConfigName="androidTest">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-06-13T00:36:12.114826400Z">
+        <DropdownSelection timestamp="2026-06-16T00:48:32.093656500Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\kylek\.android\avd\PancakeTablet.avd" />
