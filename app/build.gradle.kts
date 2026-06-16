@@ -28,6 +28,7 @@ android {
             optimization {
                 enable = false
             }
+            isDebuggable = false
         }
     }
     compileOptions {
