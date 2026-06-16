@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -274,7 +275,7 @@ class OrderPageViewModel(private val repository: OrderRepository) : ViewModel() 
         var menuItems = listOf(
             MenuItem("Adult", 1000L),
             MenuItem("Child", 500L),
-            MenuItem("Plane", 4500L),
+            MenuItem("Plane", 5000L),
             MenuItem("Staff", 0L)
         )
         _menuItems.addAll(menuItems)
@@ -359,7 +360,8 @@ class MainActivity : ComponentActivity() {
             PPBTheme {
                 Surface(
                     modifier = Modifier
-                        .fillMaxSize(),
+                        .fillMaxSize()
+                        .systemBarsPadding(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     MyApp()
@@ -460,12 +462,12 @@ fun MenuItem(
             Text(
                 "+",
                 style = MaterialTheme.typography.displayLarge,
-                modifier = Modifier.padding(vertical = 16.dp)
+                modifier = Modifier.padding(vertical = 8.dp)
             )
         }
         Text(
             "${menuItem.count}",
-            style = MaterialTheme.typography.displayMedium,
+            style = MaterialTheme.typography.displayLarge,
             modifier = Modifier.padding(vertical = 8.dp)
         )
         Button(
@@ -478,7 +480,7 @@ fun MenuItem(
             Text(
                 "-",
                 style = MaterialTheme.typography.displayLarge,
-                modifier = Modifier.padding(vertical = 16.dp)
+                modifier = Modifier.padding(vertical = 8.dp)
             )
         }
     }
@@ -486,7 +488,7 @@ fun MenuItem(
 
 @Composable
 fun Totals(totalCents: Long, totalItems: Int, onPayment: (payment: Payment) -> Unit) {
-    val card = if (totalCents == 0L) 0L else (totalCents * 1.026).toLong() + 30
+    val card = if (totalCents == 0L) 0L else (totalCents * 1.026).toLong() + 15
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround,
