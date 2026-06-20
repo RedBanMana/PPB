@@ -101,7 +101,7 @@ class Converters {
         return instant.toEpochMilliseconds() / 1000
     }
 }
-@Serializable(with = Order.Companion::class) // Links directly to the companion object below
+@Serializable(with = Order.Companion::class)
 @Entity(tableName = "orders")
 data class Order(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
@@ -113,13 +113,12 @@ data class Order(
     @ColumnInfo(name = "total_cents") val totalCents: Long,
     @ColumnInfo(name = "payment") val payment: String
 ) {
-    // Companion object implementing KSerializer to handle the entire object manually
     companion object : KSerializer<Order> {
 
         // 1. Define the structural schema for the JSON payload
         override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Order") {
             element<Int>("id")
-            element<String>("timestamp") // Maps the Instant object into a clean JSON String
+            element<String>("timestamp")
             element<Int>("adult")
             element<Int>("child")
             element<Int>("staff")
@@ -128,7 +127,6 @@ data class Order(
             element<String>("payment")
         }
 
-        // 2. Serialize: Object to JSON output format
         override fun serialize(encoder: Encoder, value: Order) {
             encoder.encodeStructure(descriptor) {
                 encodeIntElement(descriptor, 0, value.id)
@@ -143,7 +141,6 @@ data class Order(
             }
         }
 
-        // 3. Deserialize: JSON payload back into a Room-ready Order object
         override fun deserialize(decoder: Decoder): Order {
             return decoder.decodeStructure(descriptor) {
                 var id = 0
@@ -172,7 +169,6 @@ data class Order(
 
                 Order(
                     id = id,
-                    // Parse the plain text string back into a rich Instant object type
                     timestamp = Instant.parse(timestampStr),
                     adult = adult,
                     child = child,
@@ -488,7 +484,7 @@ fun MenuItem(
 
 @Composable
 fun Totals(totalCents: Long, totalItems: Int, onPayment: (payment: Payment) -> Unit) {
-    val card = if (totalCents == 0L) 0L else (totalCents * 1.026).toLong() + 15
+    val card = if (totalCents == 0L) 0L else (totalCents * 1.03).toLong()
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround,
