@@ -1,4 +1,26 @@
 <resources>
     <string name="app_name">Palmyra Pancake Breakfast</string>
     <string name="title_activity_main">Pancake Breakfast</string>
+
+    <!-- Menu Screen -->
+    <string name="menu_clear_order">Clear Order</string>
+    <string name="menu_config">Config</string>
+    <string name="menu_export">Export</string>
+    <string name="menu_order_history">Order History</string>
+    <string name="menu_payment_cash">Cash</string>
+    <string name="menu_payment_card">Card</string>
+
+    <!-- Configuration Screen -->
+    <string name="config_title">Configuration Window</string>
+    <string name="config_back">Back</string>
+    <string name="config_save">Save</string>
+    <string name="config_save_back">Save &amp; Back</string>
+    <string name="config_label_adult">Adult Price</string>
+    <string name="config_label_child">Child Price</string>
+    <string name="config_label_plane">Plane Price</string>
+    <string name="config_label_percent_fee">Card Percent Fee</string>
+    <string name="config_label_fixed_fee">Card Fixed Fee</string>
+    <string name="config_saved_success">Configuration Saved</string>
+    <string name="config_export_success">Exported to Downloads</string>
+    <string name="config_export_failed">Export Failed</string>
 </resources>

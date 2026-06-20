@@ -12,7 +12,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.ppb.R
 import com.example.ppb.data.model.MenuItem
 import com.example.ppb.data.model.Payment
 import com.example.ppb.ui.util.centsToCostStr
@@ -36,14 +38,14 @@ fun Totals(totalCents: Long, cardTotalCents: Long, totalItems: Int, onPayment: (
         horizontalArrangement = Arrangement.SpaceAround,
     ) {
         PaymentComponent(
-            "Cash",
+            stringResource(R.string.menu_payment_cash),
             totalCents,
             onClick = onPayment,
             modifier = Modifier.weight(1f),
             enabled = totalItems > 0
         )
         PaymentComponent(
-            "Card",
+            stringResource(R.string.menu_payment_card),
             cardTotalCents,
             onClick = onPayment,
             modifier = Modifier.weight(1f),

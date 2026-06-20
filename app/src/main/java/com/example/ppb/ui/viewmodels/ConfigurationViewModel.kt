@@ -46,12 +46,23 @@ class ConfigurationViewModel @Inject constructor(
     }
 
     fun saveConfiguration() {
+        val adult = adultPrice.text.toString()
+        val child = childPrice.text.toString()
+        val plane = planePrice.text.toString()
+        
+        if (adult.isBlank() || child.isBlank() || plane.isBlank()) {
+            viewModelScope.launch {
+                _eventChannel.send(UiEvent.ShowToast("Prices cannot be empty"))
+            }
+            return
+        }
+
         viewModelScope.launch {
             repository.updateConfiguration(
                 AppConfiguration(
-                    adultPrice = adultPrice.text.toString(),
-                    childPrice = childPrice.text.toString(),
-                    planePrice = planePrice.text.toString(),
+                    adultPrice = adult,
+                    childPrice = child,
+                    planePrice = plane,
                     cardPercentFee = cardPercentFee.text.toString(),
                     cardFixedFee = cardFixedFee.text.toString()
                 )
