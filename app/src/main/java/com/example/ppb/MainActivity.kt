@@ -8,9 +8,20 @@ import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldBuffer
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.text.input.setTextAndSelectAll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -19,17 +30,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -44,8 +61,10 @@ import com.example.ppb.ui.theme.PPBTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -361,46 +380,130 @@ sealed interface Screens {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyApp() {
-    val dispatcherOwner = rememberNavigationEventDispatcherOwner(
-        parent = LocalNavigationEventDispatcherOwner.current
-    )
-    CompositionLocalProvider(LocalNavigationEventDispatcherOwner provides dispatcherOwner) {
-        val backStack = remember { mutableStateListOf<Screens>(Screens.Menu) }
-        NavDisplay(
-            backStack = backStack,
-            onBack = {
-                if (backStack.count() > 1)
-                    backStack.removeLastOrNull()
-            },
-            entryProvider = entryProvider {
-                entry<Screens.Menu> {
-                    MenuScreen(onNavConfig = { backStack.add(Screens.Config) })
-                }
-                entry<Screens.Config> {
-                    Button(onClick = {
-                        if (backStack.count() > 1)
-                            backStack.removeLastOrNull()
-                    }) {
-                        ConfigurationScreen(onNavBack = {
-                            if (backStack.count() > 1)
-                                backStack.removeLastOrNull()
-                        })
-                    }
-                }
+    val backStack = remember { mutableStateListOf<Screens>(Screens.Menu) }
+    NavDisplay(
+        backStack = backStack,
+        onBack = {
+            if (backStack.count() > 1)
+                backStack.removeLastOrNull()
+        },
+        transitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
+        popTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
+        entryProvider = entryProvider {
+            entry<Screens.Menu> {
+                MenuScreen(onNavConfig = { backStack.add(Screens.Config) })
             }
-        )
+            entry<Screens.Config> {
+                ConfigurationScreen(onNavBack = {
+                    if (backStack.count() > 1)
+                        backStack.removeLastOrNull()
+                })
+            }
+        }
+    )
+}
+object DollarAmountTransformation : InputTransformation {
+    // Automatically enforces a numeric keypad when the user taps the field
+    override val keyboardOptions: KeyboardOptions = KeyboardOptions(
+        keyboardType = KeyboardType.Number
+    )
+
+    override fun TextFieldBuffer.transformInput() {
+        val input = asCharSequence().toString()
+
+        // Regex allows: empty string, just digits, or digits with a single optional decimal point up to 2 places
+        val regex = Regex("^\\d*\\.?\\d{0,2}$")
+
+        if (!regex.matches(input)) {
+            // Rejects the last typed character if it breaks currency rules
+            revertAllChanges()
+        }
+    }
+}
+class ConfigurationViewModel : ViewModel() {
+
+
+    val adultPrice = TextFieldState()
+    val childPrice = TextFieldState()
+    val planePrice = TextFieldState()
+    val cardPercentFee = TextFieldState()
+    val cardFixedFee = TextFieldState()
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+    
+
+    fun loadConfiguration() {
+        adultPrice.setTextAndPlaceCursorAtEnd("10")
+        childPrice.setTextAndPlaceCursorAtEnd("5")
+        planePrice.setTextAndPlaceCursorAtEnd("50")
+        cardPercentFee.setTextAndPlaceCursorAtEnd("0")
+        cardFixedFee.setTextAndPlaceCursorAtEnd("0")
     }
 }
 
 @Preview(showBackground = true, widthDp = 1280, heightDp = 800)
 @Composable
 fun ConfigurationScreenPreview() {
-    Text("Configuration Window")
+    ConfigurationScreen()
 }
 
 @Composable
-fun ConfigurationScreen(onNavBack: () -> Unit = {}) {
+fun ConfigurationScreen(viewModel: ConfigurationViewModel = viewModel(), onNavBack: () -> Unit = {}) {
 
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.loadConfiguration()
+    }
+    Column(Modifier.fillMaxSize().padding(8.dp)) {
+        Text("Configuration Window", style = MaterialTheme.typography.headlineLarge)
+        Button(onClick = onNavBack) {
+            Text("Back")
+        }
+        Spacer(modifier = Modifier.padding(vertical = 18.dp))
+        Row(){
+            Column(){
+                TextField(
+                    state = viewModel.adultPrice,
+                    label = { Text("Adult Price") },
+                    prefix = { Text("$ ") },
+                    inputTransformation  = DollarAmountTransformation,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                )
+                TextField(
+                    state = viewModel.childPrice,
+                    label = { Text("Child Price") },
+                    prefix = { Text("$ ") },
+                    inputTransformation  = DollarAmountTransformation,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                )
+                TextField(
+                    state = viewModel.planePrice,
+                    label = { Text("Plane Price") },
+                    prefix = { Text("$ ") },
+                    inputTransformation  = DollarAmountTransformation,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                )
+                TextField(
+                    state = viewModel.cardPercentFee,
+                    label = { Text("Card Percent Fee") },
+                    prefix = { Text("% ") },
+                    inputTransformation  = DollarAmountTransformation,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                )
+                TextField(
+                    state = viewModel.cardFixedFee,
+                    label = { Text("Card Fixed Fee") },
+                    prefix = { Text("$ ") },
+                    inputTransformation  = DollarAmountTransformation,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                )
+            }
+        }
+    }
 }
 
 
@@ -445,7 +548,9 @@ fun MenuScreen(onNavConfig: () -> Unit = {}) {
                 onPayment = { payment -> orderPageViewModel.executeOrder(payment) }
             )
             Spacer(modifier = Modifier.weight(1f))
-            Row() {
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Button(
                     onClick = { orderPageViewModel.clearOrders() },
                     colors = ButtonDefaults.buttonColors(
@@ -454,6 +559,10 @@ fun MenuScreen(onNavConfig: () -> Unit = {}) {
                     )
                 ) {
                     Text("Clear Order", style = MaterialTheme.typography.headlineMedium)
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Button(onClick = onNavConfig) {
+                    Text("Config", style = MaterialTheme.typography.headlineMedium)
                 }
             }
         }
