@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
 }
 
@@ -57,6 +58,10 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.kotlinx.serialization.json)
     ksp(libs.androidx.room.compiler)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    ksp(libs.metadata.jvm)
+    implementation(libs.hilt.navigation.compose)
     implementation(libs.material)
     implementation(libs.kotlinx.datetime)
     testImplementation(libs.junit)
