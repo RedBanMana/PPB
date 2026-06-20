@@ -1,7 +1,7 @@
 package com.example.ppb.data.local
 
 import androidx.room.TypeConverter
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 class Converters {
     @TypeConverter

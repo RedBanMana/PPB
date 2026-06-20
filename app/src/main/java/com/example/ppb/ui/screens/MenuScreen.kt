@@ -17,10 +17,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.ppb.R
 import com.example.ppb.data.model.UiEvent
 import com.example.ppb.ui.components.Menu
 import com.example.ppb.ui.components.OrderHistoryWrapper
@@ -75,11 +77,11 @@ fun MenuScreen(onNavConfig: () -> Unit = {}, menuPageViewModel: MenuPageViewMode
                         contentColor = Color.Black
                     )
                 ) {
-                    Text("Clear Order", style = MaterialTheme.typography.headlineMedium)
+                    Text(stringResource(R.string.menu_clear_order), style = MaterialTheme.typography.headlineMedium)
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 Button(onClick = onNavConfig) {
-                    Text("Config", style = MaterialTheme.typography.headlineMedium)
+                    Text(stringResource(R.string.menu_config), style = MaterialTheme.typography.headlineMedium)
                 }
             }
         }

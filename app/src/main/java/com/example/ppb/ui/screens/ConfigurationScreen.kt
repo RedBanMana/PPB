@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import com.example.ppb.R
 import com.example.ppb.data.model.UiEvent
 import com.example.ppb.ui.util.DollarAmountTransformation
 import com.example.ppb.ui.viewmodels.ConfigurationViewModel
@@ -63,23 +65,23 @@ fun ConfigurationScreen(
             .padding(8.dp)
             .verticalScroll(scrollState) // Makes content scrollable
     ) {
-        Text("Configuration Window", style = MaterialTheme.typography.headlineLarge)
+        Text(stringResource(R.string.config_title), style = MaterialTheme.typography.headlineLarge)
         Row {
             Button(onClick = onNavBack) {
-                Text("Back")
+                Text(stringResource(R.string.config_back))
             }
             Spacer(modifier = Modifier.padding(horizontal = 8.dp))
             Button(onClick = {
                 viewModel.saveConfiguration()
             }) {
-                Text("Save")
+                Text(stringResource(R.string.config_save))
             }
             Spacer(modifier = Modifier.padding(horizontal = 8.dp))
             Button(onClick = {
                 viewModel.saveConfiguration()
                 onNavBack()
             }) {
-                Text("Save & Back")
+                Text(stringResource(R.string.config_save_back))
             }
         }
         Spacer(modifier = Modifier.padding(vertical = 2.dp))
@@ -91,7 +93,7 @@ fun ConfigurationScreen(
             ) {
                 TextField(
                     state = viewModel.adultPrice,
-                    label = { Text("Adult Price") },
+                    label = { Text(stringResource(R.string.config_label_adult)) },
                     prefix = { Text("$ ") },
                     inputTransformation = DollarAmountTransformation,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -99,7 +101,7 @@ fun ConfigurationScreen(
                 )
                 TextField(
                     state = viewModel.childPrice,
-                    label = { Text("Child Price") },
+                    label = { Text(stringResource(R.string.config_label_child)) },
                     prefix = { Text("$ ") },
                     inputTransformation = DollarAmountTransformation,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -107,7 +109,7 @@ fun ConfigurationScreen(
                 )
                 TextField(
                     state = viewModel.planePrice,
-                    label = { Text("Plane Price") },
+                    label = { Text(stringResource(R.string.config_label_plane)) },
                     prefix = { Text("$ ") },
                     inputTransformation = DollarAmountTransformation,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -115,7 +117,7 @@ fun ConfigurationScreen(
                 )
                 TextField(
                     state = viewModel.cardPercentFee,
-                    label = { Text("Card Percent Fee") },
+                    label = { Text(stringResource(R.string.config_label_percent_fee)) },
                     prefix = { Text("% ") },
                     inputTransformation = DollarAmountTransformation,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -123,7 +125,7 @@ fun ConfigurationScreen(
                 )
                 TextField(
                     state = viewModel.cardFixedFee,
-                    label = { Text("Card Fixed Fee") },
+                    label = { Text(stringResource(R.string.config_label_fixed_fee)) },
                     prefix = { Text("$ ") },
                     inputTransformation = DollarAmountTransformation,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),

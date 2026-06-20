@@ -18,9 +18,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.ppb.R
 import com.example.ppb.data.model.Order
+import com.example.ppb.data.util.ItemNames
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import java.text.NumberFormat
@@ -42,7 +45,7 @@ fun OrderHistoryWrapper(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(onClick = { onExport(context) }) {
-                Text("Export", style = MaterialTheme.typography.headlineMedium)
+                Text(stringResource(R.string.menu_export), style = MaterialTheme.typography.headlineMedium)
             }
         }
     }
@@ -57,7 +60,7 @@ fun OrderHistory(orders: List<Order>, modifier: Modifier = Modifier) {
     ) {
         item {
             Text(
-                "Order History",
+                stringResource(R.string.menu_order_history),
                 style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -92,10 +95,10 @@ private fun OrderHistoryRow(order: Order) {
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            SummaryItem("Adult", order.adult, Modifier.weight(1f))
-            SummaryItem("Child", order.child, Modifier.weight(1f))
-            SummaryItem("Plane", order.plane, Modifier.weight(1f))
-            SummaryItem("Staff", order.staff, Modifier.weight(1f))
+            SummaryItem(ItemNames.ADULT, order.adult, Modifier.weight(1f))
+            SummaryItem(ItemNames.CHILD, order.child, Modifier.weight(1f))
+            SummaryItem(ItemNames.PLANE, order.plane, Modifier.weight(1f))
+            SummaryItem(ItemNames.STAFF, order.staff, Modifier.weight(1f))
         }
     }
 }

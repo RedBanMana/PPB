@@ -44,7 +44,7 @@ data class Order(
         override fun serialize(encoder: Encoder, value: Order) {
             encoder.encodeStructure(descriptor) {
                 encodeIntElement(descriptor, 0, value.id)
-                // Convert java.time.Instant directly to ISO-8601 string (e.g., "2026-06-15T20:22:00Z")
+                // Convert Instant directly to ISO-8601 string (e.g., "2026-06-15T20:22:00Z")
                 encodeStringElement(descriptor, 1, value.timestamp.toString())
                 encodeIntElement(descriptor, 2, value.adult)
                 encodeIntElement(descriptor, 3, value.child)

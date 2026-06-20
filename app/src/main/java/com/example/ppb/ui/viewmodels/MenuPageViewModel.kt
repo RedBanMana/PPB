@@ -18,6 +18,7 @@ import com.example.ppb.data.model.Payment
 import com.example.ppb.data.model.UiEvent
 import com.example.ppb.data.repository.ConfigurationRepository
 import com.example.ppb.data.repository.OrderRepository
+import com.example.ppb.data.util.ItemNames
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -65,10 +66,10 @@ class MenuPageViewModel @Inject constructor(
 
     init {
         val initialItems = listOf(
-            MenuItem("Adult", 1000L),
-            MenuItem("Child", 500L),
-            MenuItem("Plane", 5000L),
-            MenuItem("Staff", 0L)
+            MenuItem(ItemNames.ADULT, 1000L),
+            MenuItem(ItemNames.CHILD, 500L),
+            MenuItem(ItemNames.PLANE, 5000L),
+            MenuItem(ItemNames.STAFF, 0L)
         )
         _menuItems.addAll(initialItems)
 
@@ -88,9 +89,9 @@ class MenuPageViewModel @Inject constructor(
 
         _menuItems.replaceAll { item ->
             when (item.name) {
-                "Adult" -> item.copy(costCents = config.adultPrice.toCents())
-                "Child" -> item.copy(costCents = config.childPrice.toCents())
-                "Plane" -> item.copy(costCents = config.planePrice.toCents())
+                ItemNames.ADULT -> item.copy(costCents = config.adultPrice.toCents())
+                ItemNames.CHILD -> item.copy(costCents = config.childPrice.toCents())
+                ItemNames.PLANE -> item.copy(costCents = config.planePrice.toCents())
                 else -> item
             }
         }
@@ -118,10 +119,10 @@ class MenuPageViewModel @Inject constructor(
     fun executeOrder(payment: Payment) {
         val order = Order(
             timestamp = Clock.System.now(),
-            adult = _menuItems.find { it.name == "Adult" }?.count ?: 0,
-            child = _menuItems.find { it.name == "Child" }?.count ?: 0,
-            staff = _menuItems.find { it.name == "Staff" }?.count ?: 0,
-            plane = _menuItems.find { it.name == "Plane" }?.count ?: 0,
+            adult = _menuItems.find { it.name == ItemNames.ADULT }?.count ?: 0,
+            child = _menuItems.find { it.name == ItemNames.CHILD }?.count ?: 0,
+            staff = _menuItems.find { it.name == ItemNames.STAFF }?.count ?: 0,
+            plane = _menuItems.find { it.name == ItemNames.PLANE }?.count ?: 0,
             payment = payment.type,
             totalCents = payment.amountCents
         )
