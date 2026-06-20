@@ -8,12 +8,14 @@ import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldBuffer
@@ -22,6 +24,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.text.input.setTextAndSelectAll
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -355,6 +358,7 @@ class OrderPageViewModel(private val repository: OrderRepository) : ViewModel() 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //enableEdgeToEdge()
         setContent {
             PPBTheme {
 
@@ -402,6 +406,7 @@ fun MyApp() {
         }
     )
 }
+
 object DollarAmountTransformation : InputTransformation {
     // Automatically enforces a numeric keypad when the user taps the field
     override val keyboardOptions: KeyboardOptions = KeyboardOptions(
@@ -420,6 +425,7 @@ object DollarAmountTransformation : InputTransformation {
         }
     }
 }
+
 class ConfigurationViewModel : ViewModel() {
 
 
@@ -430,7 +436,7 @@ class ConfigurationViewModel : ViewModel() {
     val cardFixedFee = TextFieldState()
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
-    
+
 
     fun loadConfiguration() {
         adultPrice.setTextAndPlaceCursorAtEnd("10")
@@ -448,24 +454,36 @@ fun ConfigurationScreenPreview() {
 }
 
 @Composable
-fun ConfigurationScreen(viewModel: ConfigurationViewModel = viewModel(), onNavBack: () -> Unit = {}) {
+fun ConfigurationScreen(
+    viewModel: ConfigurationViewModel = viewModel(),
+    onNavBack: () -> Unit = {}
+) {
+
+    val scrollState = rememberScrollState()
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         viewModel.loadConfiguration()
     }
-    Column(Modifier.fillMaxSize().padding(8.dp)) {
+    Column(
+    ) {
         Text("Configuration Window", style = MaterialTheme.typography.headlineLarge)
         Button(onClick = onNavBack) {
             Text("Back")
         }
-        Spacer(modifier = Modifier.padding(vertical = 18.dp))
-        Row(){
-            Column(){
+        Spacer(modifier = Modifier.padding(vertical = 2.dp))
+        Row() {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .imePadding()
+                    .padding(horizontal = 12.dp)
+                    .verticalScroll(scrollState) // Makes content scrollable
+            ) {
                 TextField(
                     state = viewModel.adultPrice,
                     label = { Text("Adult Price") },
                     prefix = { Text("$ ") },
-                    inputTransformation  = DollarAmountTransformation,
+                    inputTransformation = DollarAmountTransformation,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     lineLimits = TextFieldLineLimits.SingleLine,
                 )
@@ -473,7 +491,7 @@ fun ConfigurationScreen(viewModel: ConfigurationViewModel = viewModel(), onNavBa
                     state = viewModel.childPrice,
                     label = { Text("Child Price") },
                     prefix = { Text("$ ") },
-                    inputTransformation  = DollarAmountTransformation,
+                    inputTransformation = DollarAmountTransformation,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     lineLimits = TextFieldLineLimits.SingleLine,
                 )
@@ -481,7 +499,7 @@ fun ConfigurationScreen(viewModel: ConfigurationViewModel = viewModel(), onNavBa
                     state = viewModel.planePrice,
                     label = { Text("Plane Price") },
                     prefix = { Text("$ ") },
-                    inputTransformation  = DollarAmountTransformation,
+                    inputTransformation = DollarAmountTransformation,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     lineLimits = TextFieldLineLimits.SingleLine,
                 )
@@ -489,7 +507,7 @@ fun ConfigurationScreen(viewModel: ConfigurationViewModel = viewModel(), onNavBa
                     state = viewModel.cardPercentFee,
                     label = { Text("Card Percent Fee") },
                     prefix = { Text("% ") },
-                    inputTransformation  = DollarAmountTransformation,
+                    inputTransformation = DollarAmountTransformation,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     lineLimits = TextFieldLineLimits.SingleLine,
                 )
@@ -497,7 +515,39 @@ fun ConfigurationScreen(viewModel: ConfigurationViewModel = viewModel(), onNavBa
                     state = viewModel.cardFixedFee,
                     label = { Text("Card Fixed Fee") },
                     prefix = { Text("$ ") },
-                    inputTransformation  = DollarAmountTransformation,
+                    inputTransformation = DollarAmountTransformation,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                )
+                TextField(
+                    state = viewModel.cardFixedFee,
+                    label = { Text("Card Fixed Fee") },
+                    prefix = { Text("$ ") },
+                    inputTransformation = DollarAmountTransformation,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                )
+                TextField(
+                    state = viewModel.cardFixedFee,
+                    label = { Text("Card Fixed Fee") },
+                    prefix = { Text("$ ") },
+                    inputTransformation = DollarAmountTransformation,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                )
+                TextField(
+                    state = viewModel.cardFixedFee,
+                    label = { Text("Card Fixed Fee") },
+                    prefix = { Text("$ ") },
+                    inputTransformation = DollarAmountTransformation,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                )
+                TextField(
+                    state = viewModel.cardFixedFee,
+                    label = { Text("Card Fixed Fee") },
+                    prefix = { Text("$ ") },
+                    inputTransformation = DollarAmountTransformation,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     lineLimits = TextFieldLineLimits.SingleLine,
                 )
