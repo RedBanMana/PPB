@@ -2,37 +2,24 @@ package com.example.ppb
 
 import android.content.ContentValues
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,17 +33,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.ColumnInfo
-import androidx.room.Dao
-import androidx.room.Database
-import androidx.room.Entity
-import androidx.room.Insert
-import androidx.room.PrimaryKey
-import androidx.room.Query
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
+import androidx.navigationevent.compose.LocalNavigationEventDispatcherOwner
+import androidx.navigationevent.compose.rememberNavigationEventDispatcherOwner
+import androidx.room.*
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverter
-import androidx.room.TypeConverters
 import com.example.ppb.ui.theme.PPBTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -101,6 +84,7 @@ class Converters {
         return instant.toEpochMilliseconds() / 1000
     }
 }
+
 @Serializable(with = Order.Companion::class)
 @Entity(tableName = "orders")
 data class Order(
@@ -258,7 +242,7 @@ class OrderPageViewModel(private val repository: OrderRepository) : ViewModel() 
     }
 
     private val _menuItems = mutableStateListOf<MenuItem>()
-    val menuItems: List<MenuItem> get() = _menuItems
+    val menuItems: List<MenuItem> = _menuItems
 
     var totalCents by mutableLongStateOf(0)
         private set
@@ -354,6 +338,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PPBTheme {
+
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
@@ -361,16 +346,72 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     MyApp()
+                    //MenuScreen()
                 }
             }
         }
     }
 }
 
+sealed interface Screens {
+    data object Menu : Screens
+    data object Config : Screens
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyApp() {
+    val dispatcherOwner = rememberNavigationEventDispatcherOwner(
+        parent = LocalNavigationEventDispatcherOwner.current
+    )
+    CompositionLocalProvider(LocalNavigationEventDispatcherOwner provides dispatcherOwner) {
+        val backStack = remember { mutableStateListOf<Screens>(Screens.Menu) }
+        NavDisplay(
+            backStack = backStack,
+            onBack = {
+                if (backStack.count() > 1)
+                    backStack.removeLastOrNull()
+            },
+            entryProvider = entryProvider {
+                entry<Screens.Menu> {
+                    MenuScreen(onNavConfig = { backStack.add(Screens.Config) })
+                }
+                entry<Screens.Config> {
+                    Button(onClick = {
+                        if (backStack.count() > 1)
+                            backStack.removeLastOrNull()
+                    }) {
+                        ConfigurationScreen(onNavBack = {
+                            if (backStack.count() > 1)
+                                backStack.removeLastOrNull()
+                        })
+                    }
+                }
+            }
+        )
+    }
+}
 
 @Preview(showBackground = true, widthDp = 1280, heightDp = 800)
 @Composable
-fun MyApp() {
+fun ConfigurationScreenPreview() {
+    Text("Configuration Window")
+}
+
+@Composable
+fun ConfigurationScreen(onNavBack: () -> Unit = {}) {
+
+}
+
+
+@Preview(showBackground = true, widthDp = 1280, heightDp = 800)
+@Composable
+fun MenuScreenPreview() {
+    MenuScreen(onNavConfig = {})
+}
+
+@Composable
+fun MenuScreen(onNavConfig: () -> Unit = {}) {
     val context = LocalContext.current
     val db = OrderDatabase.getDatabase(context)
     val repository = OrderRepository(db.ordersDao())
@@ -404,14 +445,16 @@ fun MyApp() {
                 onPayment = { payment -> orderPageViewModel.executeOrder(payment) }
             )
             Spacer(modifier = Modifier.weight(1f))
-            Button(
-                onClick = { orderPageViewModel.clearOrders() },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red,
-                    contentColor = Color.Black
-                )
-            ) {
-                Text("Clear Order", style = MaterialTheme.typography.headlineMedium)
+            Row() {
+                Button(
+                    onClick = { orderPageViewModel.clearOrders() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red,
+                        contentColor = Color.Black
+                    )
+                ) {
+                    Text("Clear Order", style = MaterialTheme.typography.headlineMedium)
+                }
             }
         }
         VerticalDivider()
@@ -432,6 +475,30 @@ fun Menu(menuItems: List<MenuItem>, onChange: (itemCount: MenuItem) -> Unit) {
         for (menuItem in menuItems) {
             MenuItem(menuItem, onChange = onChange, Modifier.weight(1f))
         }
+    }
+}
+
+@Composable
+fun Totals(totalCents: Long, totalItems: Int, onPayment: (payment: Payment) -> Unit) {
+    val card = if (totalCents == 0L) 0L else (totalCents * 1.03).toLong()
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceAround,
+    ) {
+        Payment(
+            "Cash",
+            totalCents,
+            onClick = onPayment,
+            modifier = Modifier.weight(1f),
+            enabled = totalItems > 0
+        )
+        Payment(
+            "Card",
+            card,
+            onClick = onPayment,
+            modifier = Modifier.weight(1f),
+            enabled = totalItems > 0 && card > 0
+        )
     }
 }
 
@@ -483,30 +550,6 @@ fun MenuItem(
 }
 
 @Composable
-fun Totals(totalCents: Long, totalItems: Int, onPayment: (payment: Payment) -> Unit) {
-    val card = if (totalCents == 0L) 0L else (totalCents * 1.03).toLong()
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceAround,
-    ) {
-        Payment(
-            "Cash",
-            totalCents,
-            onClick = onPayment,
-            modifier = Modifier.weight(1f),
-            enabled = totalItems > 0
-        )
-        Payment(
-            "Card",
-            card,
-            onClick = onPayment,
-            modifier = Modifier.weight(1f),
-            enabled = totalItems > 0 && card > 0
-        )
-    }
-}
-
-@Composable
 fun Payment(
     paymentType: String,
     totalCents: Long,
@@ -547,8 +590,6 @@ data class DateTimeKey(val date: kotlinx.datetime.LocalDate, val hour: Int) :
     }
 }
 
-
-@Preview(showBackground = true)
 @Composable
 fun HistoryPreview() {
     OrderHistoryWrapper(
